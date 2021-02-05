@@ -1,3 +1,5 @@
 # Ignore directories 'deprecated/' and 'IMG_Dump/'
 src/deprecated/**
 data/genomes/IMG_Dump/**
+chem_xref.txt
+Assembly_L1_20200830.mat
