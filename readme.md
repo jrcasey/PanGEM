@@ -19,3 +19,7 @@ Dependencies: [RAVEN 2.0](https://github.com/SysBioChalmers/RAVEN/wiki)\*, [Mose
 2. In Matlab, add the repository to the path: `addpath(genpath(~/path/to/PanGEM/` and navigate to the directory `cd ~/path/to/PanGEM/`
 3. Follow the sequence of steps in the folder `/StepByStep`.
 4. Please contact [me](https://jrcasey.github.io/) with questions or comments! 
+
+
+### Updates
+7/31/2021 - (Under construction) Added proteome synthesis to strain GEMs. This is currently implemented as a final (optional) step in the full PanGEM workflow, as it requires the level 1 assembly containing all the protein sequences. 
