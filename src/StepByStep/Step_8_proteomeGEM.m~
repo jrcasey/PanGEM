@@ -9,9 +9,9 @@ save_yn = true;
 
 %% Directories
 FileNames.orgDB = 'data/genomes/orgDatabase_20200805.csv'; % organism database path
-FileNames.strainModelsDir = 'data/models/strains/'; % directory containing strain models
-FileNames.Assembly_L1 = 'data/assemblies/Assembly_L1_20200830.mat'; % level 1 assembly path
-FileNames.proteomeStrainModelsDir = 'data/models/pStrains/'; % directory to store proteome GEMs for each strain
+FileNames.strainModelsDir = 'data/models/strains/'; % direc
+FileNames.Assembly_L1 = 'data/assemblies/Assembly_L1_20200830.mat';
+FileNames.proteomeStrainModelsDir = 'data/models/pStrains/';
 
 %% Import data
 % Load L1 assembly
@@ -28,7 +28,7 @@ if any(contains(strList,'.DS_Store'))
     strList(find(contains(strList,'.DS_Store'))) = [];
 end
 strList = strrep(strList,'.mat','');
-nStr = numel(strList); % number of strains in strain list
+nStr = numel(strList);
 
 
 %% Compile proteomeGEM for each strain
@@ -37,10 +37,10 @@ nStr = numel(strList); % number of strains in strain list
 for a = 1:nStr
     strName = strList{a};
     % load strMod
-    load(strcat(FileNames.strainModelsDir,strName,'.mat')); % load a strain model generated in step 6
-    model = addEnzymeSynthesis(model,Pro_Assembly_L1); % add synthesis equations for each gene product
+    load(strcat(FileNames.strainModelsDir,strName,'.mat'));
+    model = addEnzymeSynthesis(model,Pro_Assembly_L1);
     if save_yn
-        save([FileNames.proteomeStrainModelsDir,'pGEM_',strName,'.mat'],'model'); % optionally save proteomeGEM
+        save([FileNames.proteomeStrainModelsDir,'pGEM_',strName,'.mat'],'model');
     end
 end
 
@@ -77,6 +77,10 @@ for a = 1:numel(model.genes)
     total_enzyme(a) = nansum(E_g_gDW(geneRxns_idx));
 end
 
+% % top50
+% [total_enzyme_sorted, sortOrder] = sort(total_enzyme,'descend')
+% table(model.genes(sortOrder(1:50)),total_enzyme_sorted(1:50)')
+
 % assign to initial vector
 x0 = total_enzyme;
 
@@ -89,9 +93,8 @@ b = 0.5; % maximum proteome g gDW-1
 % set up optimization problem
 options = optimoptions('fmincon','ConstraintTolerance',1e-3,'MaxIterations',1000);
 prob = struct;
-prob.x0 = x0;
 prob.objective = @(x)solvePFBA(x,model,k_cat);
-prob.Aineq = A';
+prob.Aineq = A;
 prob.bineq = b;
 prob.Aeq = [];
 prob.beq = [];
@@ -101,15 +104,12 @@ prob.nonlcon = [];
 prob.solver = 'fmincon';
 prob.options = options;
 
-solPFBA = fmincon(prob);
-
 %% compare nitrogen in proteome between strains
 for a = 1:nStr
     strName = strList{a};
     load([FileNames.proteomeStrainModelsDir,'pGEM_',strName,'.mat']);
     meanN(a) = nanmean(model.geneProduct_NitrogenAtoms);
     nGenes(a) = numel(model.genes);
-    cn(a) = nanmean(model.geneProduct_CN);
 end
 
     

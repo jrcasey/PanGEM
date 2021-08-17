@@ -47,8 +47,15 @@ for b = 1:nGenes
         rxnsToAdd.subSystems = {'Enzyme Synthesis'};
         model = addRxns(model,rxnsToAdd,1,'c');
         model.orthologPresent(b) = 1;
+        
+        % add gene product elemental stats
+        model.geneProduct_NitrogenAtoms(b) = AAstats.N;
+        model.geneProduct_CN(b) = AAstats.CN;
     else
         model.orthologPresent(b) = 0;
+        
+        model.geneProduct_NitrogenAtoms(b) = NaN;
+        model.geneProduct_CN(b) = NaN;
     end
 end
 

@@ -30,7 +30,7 @@ enzyme_idx = find(contains(model.mets,'E_K'));
 genePresent_idx = find(model.orthologPresent);
 BOF_idx = find(strcmp(model.rxns,'BIOMASSCRUDE'));
 BOF_coefs = -x(genePresent_idx);
-BOF_coefs2 = 0.1.*(BOF_coefs ./ max(abs(BOF_coefs)));
+BOF_coefs2 = 0.1.*(BOF_coefs ./ max(abs(BOF_coefs)))
 model.S(enzyme_idx,BOF_idx) = BOF_coefs2;
 
 % solve updated model

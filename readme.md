@@ -11,7 +11,7 @@ Dependencies: [RAVEN 2.0](https://github.com/SysBioChalmers/RAVEN/wiki)\*, [Mose
 
 *\*You will need to sign up for a free academic license for Mosek. Not painless, unfortunately. If you are so motivated, I'd love to hear feedback on using other solvers with this toolbox, especially wrt the performance of solveCS.m.*
 
-*\*\* Very few RAVEN scripts are used, so in a future release you will not have this dependency.*
+*\*\* Very few RAVEN scripts are used, so in a future release we will not require this dependency.*
 
 
 ### Getting Started
@@ -22,4 +22,4 @@ Dependencies: [RAVEN 2.0](https://github.com/SysBioChalmers/RAVEN/wiki)\*, [Mose
 
 
 ### Updates
-7/31/2021 - (Under construction) Added proteome synthesis to strain GEMs. This is currently implemented as a final (optional) step in the full PanGEM workflow, as it requires the level 1 assembly containing all the protein sequences. 
+7/31/2021 - (Under construction) Added proteome synthesis to strain GEMs. This is currently implemented as a final (optional) step in the full PanGEM workflow, as it requires the level 1 assembly containing all the protein sequences. The new Step 8 of the PanGEM workflow generates synthesis reactions for each gene product included in each strain GEM. This is done by parsing the amino acid sequence of each gene product, stored in the level 1 assembly. proteomeGEM's are saved for each strain, along with some information about the stoichiometry of each protein. 
