@@ -15,8 +15,8 @@ ub = model.ub;
 
 % Feed options to Mosek
 params = [];
-params.relGap=0.4
-linopts = getMILPParams_Mosek8(params)
+params.relGap=0.4;
+linopts = getMILPParams_Mosek8(params);
 linopts.MSK_IPAR_OPTIMIZER='MSK_OPTIMIZER_FREE_SIMPLEX';
 
 [v,fval,exitflag,output] = linprog(-c,[],[],S,beq,lb,ub,[],linopts);
