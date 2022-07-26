@@ -22,11 +22,11 @@ sampleIdx = find(strcmp(sample,Dat.SampleID));
 % targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix(:,sampleIdx(1)));
 % targSampleKO = Dat.uniqueKO(targSampleKO_Idx);
 
-if alpha == "alpha_90";
+if alpha == "alpha90";
     targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_alpha90(:,sampleIdx(1)));
-elseif alpha == "alpha_95";
+elseif alpha == "alpha95";
     targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_alpha95(:,sampleIdx(1)));
-elseif alpha == "alpha_99";
+elseif alpha == "alpha99";
     targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_alpha99(:,sampleIdx(1)));
 else
     targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_alpha95(:,sampleIdx(1)));
