@@ -29,20 +29,18 @@ alphas = {'alpha90', 'alpha95', 'alpha99'};
 %% Paths
 working_dir  = '/Users/tatsurotanioka/Desktop/Project/BioGOSHIP_MetaPanGEM/';
 FileNames.PanGEM_path = append(working_dir, 'PanGEM/data/models/Pro_PanGEM.mat');
-FileNames.L2Assembly_path = append(working_dir, 'Make_KO_Table/KO_PresAbs_Table/MATfiles/', Transect, '_Assembly.mat');
+FileNames.L2Assembly_path = append(working_dir, 'Make_KO_Table/KO_PresAbs_Table/MATfiles/', Transect, '_Assembly_Uncurated.mat');
 FileNames.Destination_L3 = append(working_dir, 'Metagenome_GEM/Assembly_L3/',Transect,'_Assembly_L3','.mat');
 FileNames.Destination_SampleMod = append(working_dir, 'Metagenome_GEM/models/',Transect,'_SampleMod','.mat');
 FileNames.Destination_LimGrowth = append(working_dir, 'Metagenome_GEM/models/',Transect,'_LimGrowth','.mat');
-% FileNames.Destination_SampleMod_Standalone = append(working_dir, 'Metagenome_GEM/models/',Transect,'_SampleMod_Standalone_','.mat');
 
 %% Import PanGEM and the L2 Assembly
 load(FileNames.PanGEM_path)
 
 load(FileNames.L2Assembly_path)
-%%
-% strain = Pro_Assembly_L2.orgDatabase.StrainName(find(Pro_Assembly_L2.orgDatabase.Include));
-% nStrains = numel(strain);
+%% Use Uncurated Presence/Abs Matrix (i.e. CoreKOs are not forced and includes all KOs including those outside PanGEM KOs)
 
+Meta_Assembly = Meta_Assembly_Uncurated;
 sample = Meta_Assembly.SampleID;
 nSample = numel(sample);
 
@@ -97,7 +95,7 @@ for a = 1:nSample
         canRemove{a,b} = setdiff(tempRxnstoRemove,PanGEM.rxns(essentialRxns));
     end
 end
-
+PAMat_model = zeros(numel(PanGEM.genes),nSample,nAlpha); 
 for a = 1:nSample
     for b = 1:nAlpha
         targSample = sample{a};
@@ -115,6 +113,9 @@ for a = 1:nSample
         if tempSol.stat
             mu1(a,b) = -tempSol.f;
         end
+        [junk, include_idx] = intersect(PanGEM.genes,SampleMod(b).(targSample).geneSubset);
+        PAMat_model(include_idx,a,b) = 1;
+        SampleMod(b).PresenceAbsenceMatrix = PAMat_model(:,:,b);
     end
 end
 
