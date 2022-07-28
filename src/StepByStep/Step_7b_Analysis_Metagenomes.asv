@@ -9,7 +9,6 @@
 % Tatsuro Tanioka for metganome-PanGEM(July 26, 2022)
 % Original:"Step_7_Analysis.m" by John Casey
 
-clear
 %% Add PanGEM to the path
 addpath(genpath("/Users/tatsurotanioka/Desktop/Project/BioGOSHIP_MetaPanGEM/PanGEM"));
 %% Directories and load PanGEM
@@ -20,6 +19,8 @@ FileNames.SoleElements = append(working_dir, 'PanGEM/data/dbLinks/SoleElementSou
 load(FileNames.PanGEM);
 
 %% Set transect here
+clear
+
 % 
 Transect = "C13"
 % Transect = "I09"
@@ -49,7 +50,42 @@ end
 FileNames.Assembly_L3 = append(working_dir,"Make_KO_Table/KO_PresAbs_Table/MATfiles/",Transect,"_Assembly_Uncurated.mat");
 load(FileNames.Assembly_L3);
 
-[PAMat] = PlotPresAbs_KO_all(Meta_Assembly_Uncurated, alphas, Transect, working_dir);
+samples = Meta_Assembly_Uncurated.SampleID;
+nSample = numel(samples);
+PresenceAbsenceMatrix(:,:,1) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha90;
+PresenceAbsenceMatrix(:,:,2) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha95;
+PresenceAbsenceMatrix(:,:,3) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha99;
+KO_all =  Meta_Assembly_Uncurated.uniqueKO;
+CoreKO_PangeneCluster = readtable("~/Desktop/Project/BioGOSHIP_MetaPanGEM/Gene_match_PanGEM/Core_KO_PanGEM.txt");
+k = 2;
+[str_nKOs, str_order] = sort(sum(PresenceAbsenceMatrix(:,:,k),1),'descend');
+[KO_nStr, KO_order] = sort(sum(PresenceAbsenceMatrix(:,:,k),2),'descend');
+PAMat2 = PresenceAbsenceMatrix(KO_order,str_order,k);
+samples2 = samples(str_order);
+
+cmap = [1 1 1; 0 0.5 0; 1 0 0];
+figure;
+imagesc(PAMat2);
+colormap(cmap)
+xlim([1 nSample])
+ylim([0 5000]);
+xlabel('Sample')
+xlabel_name = samples2;
+xticks(1:4:length(samples2));
+xticklabels(xlabel_name(1:3:end));
+yticks(0:500:5000);
+set(gca,'TickLabelInterpreter','none')
+ylabel('KO')
+xtickangle(90)
+h=gca; h.YAxis.TickLength = [0 0];
+h=gca; h.XAxis.TickLength = [0 0];
+set(gca,'FontSize',8)
+h2 = text(1:4:length(samples2), repelem(length(KO_nStr)+350,length(1:4:length(samples2))),string(str_nKOs(1:4:end)), "FontSize",6,'Interpreter', 'none','FontWeight','bold');
+set(h2,'Rotation',90);
+text(-10, (length(KO_nStr))+300, "Total KO", "FontSize",7,'Interpreter', 'none')
+
+%%
+[PAMat] = PlotPresAbs_KO_all(Meta_Assembly_Uncurated, SCCG_select, alphas, Transect, working_dir);
 %% Check growth potential for all strains
 % This last section takes the longest time.
 
@@ -232,13 +268,18 @@ function [PAMat] = PlotPresAbs_KO_GEM(PanGEM, SampleMod, samples, alphas, Transe
 end
 
 %% Function to visualize all KO gene presence/absence from coverage table
-% Red = Samples with SCCG coverage > 5
-function [PAMat2] = PlotPresAbs_KO_all(Meta_Assembly_Uncurated, alphas, Transect, working_dir);
-
-    samples = Meta_Assembly_Uncurated.SampleID;
-    PresenceAbsenceMatrix(:,:,1) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha90;
-    PresenceAbsenceMatrix(:,:,2) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha95;
-    PresenceAbsenceMatrix(:,:,3) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha99;    
+function [PAMat2] = PlotPresAbs_KO_all(Meta_Assembly_Uncurated, SCCG_select, alphas, Transect, working_dir);
+    if SCCG_select == 1; % Selecting samples based on SCCG of 5
+        samples = Meta_Assembly_Uncurated.SampleID_SCCGselected;
+        PresenceAbsenceMatrix(:,:,1) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha90_SCCGselected;
+        PresenceAbsenceMatrix(:,:,2) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha95_SCCGselected;
+        PresenceAbsenceMatrix(:,:,3) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha99_SCCGselected;
+    else
+        samples = Meta_Assembly_Uncurated.SampleID;
+        PresenceAbsenceMatrix(:,:,1) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha90;
+        PresenceAbsenceMatrix(:,:,2) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha95;
+        PresenceAbsenceMatrix(:,:,3) = Meta_Assembly_Uncurated.PresenceAbsenceMatrix_alpha99;    
+    end
     nSample = numel(samples);
     KO_all =  Meta_Assembly_Uncurated.uniqueKO;
     CoreKO_PangeneCluster = readtable("~/Desktop/Project/BioGOSHIP_MetaPanGEM/Gene_match_PanGEM/Core_KO_PanGEM.txt");
@@ -251,13 +292,7 @@ function [PAMat2] = PlotPresAbs_KO_all(Meta_Assembly_Uncurated, alphas, Transect
         subplot(3,1,k)
         [str_nKOs, str_order] = sort(sum(PresenceAbsenceMatrix(:,:,k),1),'descend');
         [KO_nStr, KO_order] = sort(sum(PresenceAbsenceMatrix(:,:,k),2),'descend');
-        % Pickout samples with SCCG coverage > 5
-        HQ_strIdx = find(ismember(Meta_Assembly_Uncurated.SampleID,Meta_Assembly_Uncurated.SampleID_SCCGselected));
-        for a = 1:numel(HQ_strIdx)
-            HQ_strIdx2(a) = find(HQ_strIdx(a) == str_order);
-        end
         PAMat2 = PresenceAbsenceMatrix(KO_order,str_order,k);
-        PAMat2(:,HQ_strIdx2) = PAMat2(:,HQ_strIdx2)*2;
         samples2 = samples(str_order);
         imagesc(PAMat2);
         xlim([1 nSample])
@@ -273,14 +308,13 @@ function [PAMat2] = PlotPresAbs_KO_all(Meta_Assembly_Uncurated, alphas, Transect
         h=gca; h.YAxis.TickLength = [0 0];
         h=gca; h.XAxis.TickLength = [0 0];
         set(gca,'FontSize',8)
-        h2 = text(1:4:length(samples2), repelem(length(KO_nStr)+1400,length(1:4:length(samples2))),string(str_nKOs(1:4:end)), "FontSize",6,'Interpreter', 'none','FontWeight','bold');
+        h2 = text(1:4:length(samples2), repelem(length(KO_nStr)+1200,length(1:4:length(samples2))),string(str_nKOs(1:4:end)), "FontSize",6,'Interpreter', 'none','FontWeight','bold');
         set(h2,'Rotation',90);
-        text(-20, (length(KO_nStr))+1100, "Total KO", "FontSize",7,'Interpreter', 'none')
+        text(-20, (length(KO_nStr))+900, "Total KO", "FontSize",7,'Interpreter', 'none')
+        if S
         title_plot=append(Transect,"_KO_coverage_",alphas{k});
-        filename = append(working_dir,"Metagenome_GEM/Analysis_Plots/",Transect,"_KO_coverage.pdf");
         title(title_plot,'Interpreter', 'none')
         hold on
     end
-    orient(f, 'portrait')
-    print(f, filename, '-dpdf', '-bestfit')
+
 end
