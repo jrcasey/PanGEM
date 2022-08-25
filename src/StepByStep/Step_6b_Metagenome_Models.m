@@ -17,6 +17,7 @@
 
 %% 
 clear
+
 % Set transect here
 % Transect = "C13"
 % Transect = "I09"
@@ -33,7 +34,9 @@ FileNames.L2Assembly_path = append(working_dir, 'Make_KO_Table/KO_PresAbs_Table/
 FileNames.Destination_L3 = append(working_dir, 'Metagenome_GEM/Assembly_L3/',Transect,'_Assembly_L3','.mat');
 FileNames.Destination_SampleMod = append(working_dir, 'Metagenome_GEM/models/',Transect,'_SampleMod','.mat');
 FileNames.Destination_LimGrowth = append(working_dir, 'Metagenome_GEM/models/',Transect,'_LimGrowth','.mat');
-
+FileNames.Destination_SampleMod_Merged = append(working_dir, 'Metagenome_GEM/models/SampleMod_Merged.mat');
+%% add PanGEM codes to the path
+addpath(genpath(append(working_dir,'PanGEM/src/')))
 %% Import PanGEM and the L2 Assembly
 load(FileNames.PanGEM_path)
 
@@ -41,7 +44,12 @@ load(FileNames.L2Assembly_path)
 %% Use Uncurated Presence/Abs Matrix (i.e. CoreKOs are not forced and includes all KOs including those outside PanGEM KOs)
 
 Meta_Assembly = Meta_Assembly_Uncurated;
-sample = Meta_Assembly.SampleID;
+sample = Meta_Assembly.SampleID_SCCGselected;
+% Remove deep samples from NH1418
+if Transect == "Globe_AMT_P18_etc";
+    deep_samples = {'NH1418_134', 'NH1418_232', 'NH1418_328'};
+    sample = setdiff(sample, deep_samples);    
+end
 nSample = numel(sample);
 
 %% Get essential reaction subset from PanGEM
@@ -207,9 +215,22 @@ Meta_Assembly_L3.PAMat_rxns_alpha99 = PAMat_rxns(:,:,3);
 %% Save metagenome sample models and L3 structure
 save(FileNames.Destination_L3,'Meta_Assembly_L3');
 
+SampleMod = rmfield(SampleMod, 'PresenceAbsenceMatrix');
 save(FileNames.Destination_SampleMod,'SampleMod');
 
+%% Merge all the Sample Mod from different cruises into one
+load(append(working_dir, 'Metagenome_GEM/models/I09_SampleMod.mat'))
+SampleMod_I09 = SampleMod;
+load(append(working_dir, 'Metagenome_GEM/models/Globe_AMT_P18_etc_SampleMod.mat'))
+SampleMod_Globe_AMT_P18_etc = SampleMod;
+load(append(working_dir, 'Metagenome_GEM/models/I07_SampleMod.mat'))
+SampleMod_I07 = SampleMod;
+load(append(working_dir, 'Metagenome_GEM/models/C13_SampleMod.mat'))
+SampleMod_C13 = SampleMod;
 
+mergestructs_4 = @(w,x,y,z) cell2struct([struct2cell(w);struct2cell(x);struct2cell(y);struct2cell(z)],[fieldnames(w);fieldnames(x);fieldnames(y);fieldnames(z)]);
+SampleMod_Merged = mergestructs_4(SampleMod_I09,SampleMod_Globe_AMT_P18_etc,SampleMod_I07,SampleMod_C13);
+save(FileNames.Destination_SampleMod_Merged,'SampleMod_Merged');
 %% OPTIONAL - Check metagenome models for growth under different limiting conditions
 % load('data/models/StrMod.mat');
 load(FileNames.Destination_SampleMod)
