@@ -1,2 +1,0 @@
-# KEGG KO assignments
-> 649 Prochlorococcus genomes were downloaded from IMG/MER and NCBI (GenBank). Multi-fasta's for both nucleotide (.fna) and translated amino acid (.faa) coding sequences (CDS) were downloaded. Two subsets were created because we exceeded the maximum file size for the annotation server. Each subset was concatenated and sent to KEGG's ghostKOALA server using the 'genus prokaryote' search group. Results from each subset were concatenated and the order of genomes was preserved by concatenating the file lists from each subset.   
