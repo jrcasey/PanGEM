@@ -28,8 +28,26 @@ elseif alpha == "alpha95";
     targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_alpha95(:,sampleIdx(1)));
 elseif alpha == "alpha99";
     targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_alpha99(:,sampleIdx(1)));
-else
-    targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_alpha95(:,sampleIdx(1)));
+elseif alpha == "top910";
+    targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_top910(:,sampleIdx(1)));
+elseif alpha == "top920";
+    targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_top920(:,sampleIdx(1)));
+elseif alpha == "top930";
+    targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_top930(:,sampleIdx(1)));
+elseif alpha == "top940";
+    targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_top940(:,sampleIdx(1)));
+elseif alpha == "top950";
+    targSampleKO_Idx = find(Dat.PresenceAbsenceMatrix_top950(:,sampleIdx(1)));    
+elseif alpha == "Random_top910";
+    targSampleKO_Idx = find(Dat.Random_top910(:,sampleIdx(1)));   
+elseif alpha == "Random_top920";
+    targSampleKO_Idx = find(Dat.Random_top920(:,sampleIdx(1)));       
+elseif alpha == "Random_top930";
+    targSampleKO_Idx = find(Dat.Random_top930(:,sampleIdx(1)));   
+elseif alpha == "Random_top940";
+    targSampleKO_Idx = find(Dat.Random_top940(:,sampleIdx(1)));   
+elseif alpha == "Random_top950";
+    targSampleKO_Idx = find(Dat.Random_top950(:,sampleIdx(1)));       
 end
 
 targSampleKO = Dat.uniqueKO(targSampleKO_Idx);
